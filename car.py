@@ -36,36 +36,48 @@ i2c = busio.I2C(SCL, SDA)
 pca = PCA9685(i2c)
 pca.frequency = FREQ
 
-def set_pwm(channel, microseconds):
-    """
-    Translates microseconds (e.g., 1500) into the 0-0xFFFF (0-65535) scale
-    required by the slide's instruction:
-    pca.channels[CHANNEL].duty_cycle = <scaled signal>
-    """
-    period_in_microseconds = 1000000 / 60
-    duty_cycle = int((microseconds / period_in_microseconds) * 65535)
+
+servo_channel = 3
+
+while True:
+    pca.channels[servo_channel].duty_cycle = 2000
+    time.sleep(1)
     
-    # Safety check to keep it within 16-bit limits
-    if duty_cycle > 65535: duty_cycle = 65535
+    pca.channels[servo_channel].duty_cycle = 6000
+    time.sleep(1)
+
+
+
+# def set_pwm(channel, microseconds):
+#     """
+#     Translates microseconds (e.g., 1500) into the 0-0xFFFF (0-65535) scale
+#     required by the slide's instruction:
+#     pca.channels[CHANNEL].duty_cycle = <scaled signal>
+#     """
+#     period_in_microseconds = 1000000 / 60
+#     duty_cycle = int((microseconds / period_in_microseconds) * 65535)
     
-    pca.channels[channel].duty_cycle = duty_cycle
+#     # Safety check to keep it within 16-bit limits
+#     if duty_cycle > 65535: duty_cycle = 65535
+    
+#     pca.channels[channel].duty_cycle = duty_cycle
 
-try:
-    # "Send a PWM pulse that's high for 1.5 ms... have this last for 2 seconds"
-    print(">>> Arming ESC (1.5ms for 2 seconds)...")
-    set_pwm(ESC_CHANNEL, NEUTRAL)
-    time.sleep(2)
+# try:
+#     # "Send a PWM pulse that's high for 1.5 ms... have this last for 2 seconds"
+#     print(">>> Arming ESC (1.5ms for 2 seconds)...")
+#     set_pwm(ESC_CHANNEL, NEUTRAL)
+#     time.sleep(2)
 
-    print(">>> MOVING FORWARD!")
-    set_pwm(ESC_CHANNEL, FORWARD) 
-    time.sleep(2)
+#     print(">>> MOVING FORWARD!")
+#     set_pwm(ESC_CHANNEL, FORWARD) 
+#     time.sleep(2)
 
-except KeyboardInterrupt:
-    print("\nStopping early...")
+# except KeyboardInterrupt:
+#     print("\nStopping early...")
 
-finally:
-    print(">>> Tearing down (Resetting to Neutral and De-initializing)")
-    set_pwm(ESC_CHANNEL, NEUTRAL) # Safety stop first
-    time.sleep(0.1)
-    pca.deinit() # The specific command from your slide
-    print(">>> Done.")
+# finally:
+#     print(">>> Tearing down (Resetting to Neutral and De-initializing)")
+#     set_pwm(ESC_CHANNEL, NEUTRAL) # Safety stop first
+#     time.sleep(0.1)
+#     pca.deinit() # The specific command from your slide
+#     print(">>> Done.")
